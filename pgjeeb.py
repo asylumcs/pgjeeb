@@ -16,8 +16,9 @@ import textwrap
 import datetime
 import regex as re
 
+
 class Pgjeeb:
-    """ UTF-8 Jeebies, new algorithm """
+    """UTF-8 Jeebies, new algorithm"""
 
     def __init__(self, args):
         self.infile = args.infile
@@ -45,7 +46,7 @@ class Pgjeeb:
         self.root = os.path.dirname(os.path.realpath(__file__))
 
     def fatal(self, message):
-        """ display fatal error and exit """
+        """display fatal error and exit"""
         sys.stderr.write("fatal: " + message + "\n")
         sys.exit(1)
 
@@ -82,9 +83,11 @@ class Pgjeeb:
         with open(self.outfile, "w", encoding="UTF-8") as f:
             f.write("<pre>")
             f.write("pgjeeb run report\n")
-            f.write(f"run started: {str(datetime.datetime.now())}\n");
+            f.write(f"run started: {str(datetime.datetime.now())}\n")
             f.write("source file: {}\n".format(os.path.basename(self.infile)))
-            f.write(f"<span style='background-color:#FFFFDD'>close this window to return to the UWB.</span>\n");
+            f.write(
+                f"<span style='background-color:#FFFFDD'>close this window to return to the UWB.</span>\n"
+            )
             f.write("\n")
             for s in b:
                 f.write("{:s}\r\n".format(s))
@@ -124,7 +127,7 @@ class Pgjeeb:
                 self.bejeemap3[m.group(1)] = int(m.group(2))
 
     def showcontext(self, s, lookfor, stats):
-        """ highlighted single report """
+        """highlighted single report"""
         badness = f"{stats[0]} {stats[1]} {stats[2]} {stats[3]}"
         s2 = f"{s}"
         m = re.search(lookfor, s2, re.IGNORECASE)
@@ -144,7 +147,7 @@ class Pgjeeb:
             self.lastlookfor = lookfor
 
     def myfindall(self, regex, searchstring):
-        """ a findall that returns match objects, not strings """
+        """a findall that returns match objects, not strings"""
         pos = 0
         while True:
             match = regex.search(searchstring, pos)
@@ -154,11 +157,11 @@ class Pgjeeb:
             pos = match.end()
 
     def buildReport(self):
-        """ generates the HTML report, with highlighting """
+        """generates the HTML report, with highlighting"""
         lastlinenum = ""
         lastlinelastword = ""
         # self.runlog.sort()
-        for _,s in enumerate(self.runlog):
+        for _, s in enumerate(self.runlog):
             s = s.replace(
                 "☱",
                 "<span style='border:1px solid silver; background-color:#FFFFAA'>",
@@ -169,8 +172,8 @@ class Pgjeeb:
             self.report.append(s)
 
     def split_into_sentences(self, text):
-        """ regex approach """
-        alphabets= "([A-Za-z])"
+        """regex approach"""
+        alphabets = "([A-Za-z])"
         digits = "([0-9])"
         prefixes = "(Mr|St|Mrs|Ms|Dr)[.]"
         suffixes = "(Inc|Ltd|Jr|Sr|Co)"
@@ -179,35 +182,44 @@ class Pgjeeb:
         websites = "[.](com|net|org|io|gov)"
         # begin split
         text = " " + text + "  "
-        text = text.replace("\n"," ")
-        text = re.sub(prefixes,"\\1<prd>",text)
-        text = re.sub(websites,"<prd>\\1",text)
-        if "Ph.D" in text: text = text.replace("Ph.D.","Ph<prd>D<prd>")
-        text = re.sub("\s" + alphabets + "[.] "," \\1<prd> ",text)
-        text = re.sub(acronyms+" "+starters,"\\1<stop> \\2",text)
-        text = re.sub(digits + "[.]" + digits,"\\1<prd>\\2",text)
-        text = text.replace("e.g.","e<prd>g<prd>")
-        text = text.replace("...","<prd><prd><prd>")
-        text = re.sub(alphabets + "[.]" + alphabets + "[.]" + alphabets + "[.]","\\1<prd>\\2<prd>\\3<prd>",text)
-        text = re.sub(alphabets + "[.]" + alphabets + "[.]","\\1<prd>\\2<prd>",text)
-        text = re.sub(" "+suffixes+"[.] "+starters," \\1<stop> \\2",text)
-        text = re.sub(" "+suffixes+"[.]"," \\1<prd>",text)
-        text = re.sub(" " + alphabets + "[.]"," \\1<prd>",text)
-        if "”" in text: text = text.replace(".”","”.")
-        if "\"" in text: text = text.replace(".\"","\".")
-        if "!" in text: text = text.replace("!\"","\"!")
-        if "?" in text: text = text.replace("?\"","\"?")
-        text = text.replace(".",".<stop>")
-        text = text.replace("?","?<stop>")
-        text = text.replace("!","!<stop>")
-        text = text.replace("<prd>",".")
+        text = text.replace("\n", " ")
+        text = re.sub(prefixes, "\\1<prd>", text)
+        text = re.sub(websites, "<prd>\\1", text)
+        if "Ph.D" in text:
+            text = text.replace("Ph.D.", "Ph<prd>D<prd>")
+        text = re.sub("\s" + alphabets + "[.] ", " \\1<prd> ", text)
+        text = re.sub(acronyms + " " + starters, "\\1<stop> \\2", text)
+        text = re.sub(digits + "[.]" + digits, "\\1<prd>\\2", text)
+        text = text.replace("e.g.", "e<prd>g<prd>")
+        text = text.replace("...", "<prd><prd><prd>")
+        text = re.sub(
+            alphabets + "[.]" + alphabets + "[.]" + alphabets + "[.]",
+            "\\1<prd>\\2<prd>\\3<prd>",
+            text,
+        )
+        text = re.sub(alphabets + "[.]" + alphabets + "[.]", "\\1<prd>\\2<prd>", text)
+        text = re.sub(" " + suffixes + "[.] " + starters, " \\1<stop> \\2", text)
+        text = re.sub(" " + suffixes + "[.]", " \\1<prd>", text)
+        text = re.sub(" " + alphabets + "[.]", " \\1<prd>", text)
+        if "”" in text:
+            text = text.replace(".”", "”.")
+        if '"' in text:
+            text = text.replace('."', '".')
+        if "!" in text:
+            text = text.replace('!"', '"!')
+        if "?" in text:
+            text = text.replace('?"', '"?')
+        text = text.replace(".", ".<stop>")
+        text = text.replace("?", "?<stop>")
+        text = text.replace("!", "!<stop>")
+        text = text.replace("<prd>", ".")
         sentences = text.split("<stop>")
         sentences = sentences[:-1]
         sentences = [s.strip() for s in sentences]
         return sentences
 
     def parseBlob(self):
-        """ text is loaded, maps are in place """
+        """text is loaded, maps are in place"""
         s = ""
         for line in self.wb:
             s = s + " " + line
@@ -245,7 +257,7 @@ class Pgjeeb:
             self.words3.append(t)
 
     def look2words(self, thehe2look, thebe2look):
-        """ look up occurrences of each form """
+        """look up occurrences of each form"""
 
         # first check for exact match in 2-word maps
         if thehe2look in self.hejeemap2:
@@ -274,7 +286,7 @@ class Pgjeeb:
         return (he2count, be2count)
 
     def look3words(self, thehe3look, thebe3look):
-        """ look up occurrences of each form """
+        """look up occurrences of each form"""
         if thehe3look in self.hejeemap3:
             he3count = self.hejeemap3[thehe3look]
         else:
@@ -286,7 +298,7 @@ class Pgjeeb:
         return (he3count, be3count)
 
     def abe2(self, s):
-        """ analyze 2-word 'he' or 'be' form """
+        """analyze 2-word 'he' or 'be' form"""
         # returns -1->NO, 0->NF, 1->OK
         t = s.split(" ")
         h2look = f"|he|{t[1]}"
@@ -302,7 +314,7 @@ class Pgjeeb:
         return result, he2count, be2count
 
     def abe3(self, s):
-        """ analyze 3-word 'he' or 'be' form """
+        """analyze 3-word 'he' or 'be' form"""
         # returns -1->NO, 0->NF, 1->OK
         t = s.split(" ")
         h3look = f"{t[0]}|he|{t[2]}"
@@ -318,7 +330,7 @@ class Pgjeeb:
         return result, he3count, be3count
 
     def scanBook(self):
-        """ scan the book for reportable he/be suspects """
+        """scan the book for reportable he/be suspects"""
         for u, _ in enumerate(self.sentences):  # each sentence separately
             # print(f"{u:6} {self.sentences[u]}") ##
             i2 = 0  # index into 2-word forms
@@ -382,10 +394,10 @@ class Pgjeeb:
                     i2 += 1  # advance 2-word form only
 
     def run(self):
-        """ runs the program """
+        """runs the program"""
         (self.wb, self.encoding) = self.load_file(self.infile)
-        (self.hejee, _) = self.load_file(self.root+"/he-utf8.jee")
-        (self.bejee, _) = self.load_file(self.root+"/be-utf8.jee")
+        (self.hejee, _) = self.load_file(self.root + "/he-utf8.jee")
+        (self.bejee, _) = self.load_file(self.root + "/be-utf8.jee")
         self.makemap_hejee()
         self.makemap_bejee()
 
@@ -395,7 +407,7 @@ class Pgjeeb:
         # print(self.words2[0]) ##
         # print(self.words3[0]) ##
         self.buildReport()
-        #for i,line in enumerate(self.report):
+        # for i,line in enumerate(self.report):
         #    print(i,line)
         self.saveFile(self.report)
 
